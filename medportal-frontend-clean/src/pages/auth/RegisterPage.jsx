@@ -358,7 +358,7 @@ const RegisterPage = () => {
       {/* Right Side - Image */}
       <div className={styles.registerImageSide}>
         <img
-          src="/src/assets/20250923_2027_Doctor's Care and Compassion_simple_compose_01k5w0me1wed1s39vxj4acwg7f.png"
+          src="https://i.pinimg.com/736x/6f/4d/04/6f4d0420b0c9013ba3c1bc9e997a1273.jpg"
           alt="Healthcare professionals illustration"
           className={styles.registerIllustration}
           onError={(e) => {

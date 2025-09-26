@@ -1,4 +1,6 @@
+// src/pages/dashboard/PatientDashboard.jsx - FULLY UPDATED WITH NAVIGATION
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Heart, 
   Calendar, 
@@ -21,11 +23,13 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { appointmentService, recordsService, subscriptionService } from '../../services/api';
 import BookAppointmentModal from '../../components/modals/BookAppointmentModal';
+import SubscriptionsModal from '../../components/modals/SubscriptionsModal';
 import Notification from '../../components/common/Notification';
 import styles from './PatientDashboard.module.css';
 
 const PatientDashboard = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [data, setData] = useState({
     appointments: [],
     records: [],
@@ -35,7 +39,7 @@ const PatientDashboard = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showSubscriptionsModal, setShowSubscriptionsModal] = useState(false);
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
@@ -71,7 +75,6 @@ const PatientDashboard = () => {
   const handleUpgrade = async (planType) => {
     try {
       await subscriptionService.upgrade({ plan: planType });
-      // Refresh subscription data
       const subscriptionRes = await subscriptionService.getCurrent();
       setData(prev => ({ ...prev, subscription: subscriptionRes.data }));
       
@@ -106,7 +109,6 @@ const PatientDashboard = () => {
       message: 'Appointment booked successfully! You will receive a confirmation email shortly.'
     });
 
-    // Refresh appointments data after successful booking
     try {
       const appointmentsRes = await appointmentService.getMyAppointments();
       const subscriptionRes = await subscriptionService.getCurrent();
@@ -120,12 +122,11 @@ const PatientDashboard = () => {
     }
   };
 
-  // Check if user can book appointments
   const canBookAppointment = () => {
     if (!data.subscription) return { allowed: false, reason: 'Loading subscription...' };
     
     const remaining = data.subscription.remaining_this_month;
-    if (remaining === null) return { allowed: true }; // Unlimited
+    if (remaining === null) return { allowed: true };
     if (remaining > 0) return { allowed: true };
     
     return { 
@@ -134,7 +135,6 @@ const PatientDashboard = () => {
     };
   };
 
-  // Check subscription tier features
   const getSubscriptionFeatures = () => {
     const tier = data.subscription?.tier || 'free';
     
@@ -207,10 +207,6 @@ const PatientDashboard = () => {
     }
   };
 
-  const nextAppointment = data.appointments.find(apt => 
-    new Date(apt.start) > new Date() && apt.status === 'scheduled'
-  );
-
   const features = getSubscriptionFeatures();
 
   if (loading) {
@@ -236,13 +232,11 @@ const PatientDashboard = () => {
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.headerContent}>
-          {/* Logo */}
           <div className={styles.logo}>
             <Heart className={styles.logoIcon} />
             <span className={styles.logoText}>MedPortal</span>
           </div>
           
-          {/* Search */}
           <div className={styles.searchContainer}>
             <Search className={styles.searchIcon} />
             <input
@@ -252,7 +246,6 @@ const PatientDashboard = () => {
             />
           </div>
 
-          {/* Right side */}
           <div className={styles.headerRight}>
             <button className={styles.notificationButton}>
               <Bell className={styles.bellIcon} />
@@ -281,23 +274,53 @@ const PatientDashboard = () => {
           {/* Sidebar */}
           <div className={styles.sidebar}>
             <nav className={styles.sidebarNav}>
-              {[
-                { id: 'overview', icon: Heart, label: 'Overview' },
-                { id: 'appointments', icon: Calendar, label: 'Appointments' },
-                { id: 'records', icon: FileText, label: 'Medical Records' },
-                { id: 'subscription', icon: Crown, label: 'Subscription' },
-                { id: 'profile', icon: User, label: 'Profile' },
-                { id: 'settings', icon: Settings, label: 'Settings' }
-              ].map(({ id, icon: Icon, label }) => (
-                <button
-                  key={id}
-                  onClick={() => setActiveTab(id)}
-                  className={`${styles.navButton} ${activeTab === id ? styles.navButtonActive : ''}`}
-                >
-                  <Icon className={styles.navIcon} />
-                  {label}
-                </button>
-              ))}
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`${styles.navButton} ${activeTab === 'overview' ? styles.navButtonActive : ''}`}
+              >
+                <Heart className={styles.navIcon} />
+                Overview
+              </button>
+              
+              <button
+                onClick={() => navigate('/patient/appointments')}
+                className={styles.navButton}
+              >
+                <Calendar className={styles.navIcon} />
+                Appointments
+              </button>
+              
+              <button
+                onClick={() => navigate('/patient/records')}
+                className={styles.navButton}
+              >
+                <FileText className={styles.navIcon} />
+                Medical Records
+              </button>
+              
+              <button
+                onClick={() => setShowSubscriptionsModal(true)}
+                className={styles.navButton}
+              >
+                <Crown className={styles.navIcon} />
+                Subscription
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`${styles.navButton} ${activeTab === 'profile' ? styles.navButtonActive : ''}`}
+              >
+                <User className={styles.navIcon} />
+                Profile
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`${styles.navButton} ${activeTab === 'settings' ? styles.navButtonActive : ''}`}
+              >
+                <Settings className={styles.navIcon} />
+                Settings
+              </button>
             </nav>
           </div>
 
@@ -313,7 +336,6 @@ const PatientDashboard = () => {
                   Here's an overview of your health today
                 </p>
                 
-                {/* Quick Stats */}
                 <div className={styles.heroStats}>
                   <div className={styles.heroStat}>
                     <div className={styles.heroStatValue}>
@@ -335,10 +357,9 @@ const PatientDashboard = () => {
                 </div>
               </div>
               
-              {/* Medical Illustration */}
               <div className={styles.heroIllustration}>
                 <img 
-                  src="/src/assets/20250925_0117_Human Muscular Anatomy_simple_compose_01k5z3mzx6fy19m0y4xmetdgja.png"
+                  src="https://i.pinimg.com/736x/3b/9d/9a/3b9d9ab556375cebcdbe86b0c1f494b5.jpg"
                   alt="Medical Anatomy"
                   className={styles.anatomyImage}
                   onError={(e) => {
@@ -363,7 +384,7 @@ const PatientDashboard = () => {
                   </div>
                   <button 
                     className={styles.alertButton}
-                    onClick={() => setShowUpgradeModal(true)}
+                    onClick={() => setShowSubscriptionsModal(true)}
                   >
                     View Plans
                   </button>
@@ -377,7 +398,10 @@ const PatientDashboard = () => {
                 <h2 className={styles.sectionTitle}>
                   <strong>{data.records.length}</strong> Medical Records
                 </h2>
-                <button className={styles.viewAllButton}>
+                <button 
+                  className={styles.viewAllButton}
+                  onClick={() => navigate('/patient/records')}
+                >
                   View All <ChevronRight className={styles.chevronIcon} />
                 </button>
               </div>
@@ -385,7 +409,11 @@ const PatientDashboard = () => {
                 {data.records.length > 0 ? (
                   <div className={styles.recordsList}>
                     {data.records.slice(0, 3).map((record) => (
-                      <div key={record.id} className={styles.recordItem}>
+                      <div 
+                        key={record.id} 
+                        className={styles.recordItem}
+                        onClick={() => navigate('/patient/records')}
+                      >
                         <div className={styles.recordIcon}>{getRecordIcon(record.title)}</div>
                         <div className={styles.recordContent}>
                           <h3 className={styles.recordTitle}>{record.title}</h3>
@@ -453,17 +481,24 @@ const PatientDashboard = () => {
                     <p>No upcoming appointments</p>
                   </div>
                 )}
+                
+                <button 
+                  className={styles.viewAllAppointmentsButton}
+                  onClick={() => navigate('/patient/appointments')}
+                >
+                  View All Appointments
+                  <ArrowRight size={16} />
+                </button>
               </div>
             </div>
 
-            {/* Book Appointment with Subscription Awareness */}
+            {/* Book Appointment Card */}
             <div className={styles.availableDoctorsCard}>
               <div className={styles.scheduleHeader}>
                 <h2 className={styles.scheduleTitle}>Book Appointment</h2>
                 <p className={styles.scheduleSubtitle}>Available doctors</p>
               </div>
               <div className={styles.scheduleContent}>
-                {/* Subscription Status */}
                 <div className={styles.bookingStatus}>
                   <div className={styles.remainingAppointments}>
                     <span>Remaining this month:</span>
@@ -480,8 +515,6 @@ const PatientDashboard = () => {
                     </div>
                   )}
                 </div>
-
-
 
                 <button 
                   className={`${styles.bookButton} ${!canBookAppointment().allowed ? styles.disabled : ''}`}
@@ -523,7 +556,6 @@ const PatientDashboard = () => {
                 </div>
               </div>
 
-              {/* Feature List */}
               <div className={styles.featuresList}>
                 <div className={`${styles.feature} ${features.telehealth ? styles.available : styles.restricted}`}>
                   {features.telehealth ? <Video size={16} /> : <Lock size={16} />}
@@ -569,13 +601,7 @@ const PatientDashboard = () => {
 
               <button 
                 className={styles.upgradeButton}
-                onClick={() => {
-                  if (data.subscription?.tier === 'premium') {
-                    setActiveTab('subscription');
-                  } else {
-                    handleUpgrade(data.subscription?.tier === 'free' ? 'basic' : 'premium');
-                  }
-                }}
+                onClick={() => setShowSubscriptionsModal(true)}
               >
                 {data.subscription?.tier === 'premium' ? 'Manage Plan' : 'Upgrade Now'}
                 <ArrowRight className={styles.upgradeArrow} />
@@ -585,107 +611,18 @@ const PatientDashboard = () => {
         </div>
       </div>
 
-      {/* Subscription Plans Modal */}
-      {showUpgradeModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowUpgradeModal(false)}>
-          <div className={styles.subscriptionModal} onClick={e => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>Choose Your Plan</h2>
-              <button onClick={() => setShowUpgradeModal(false)} className={styles.closeModal}>
-                ×
-              </button>
-            </div>
-            
-            <div className={styles.plansGrid}>
-              {/* Free Plan */}
-              <div className={`${styles.planCard} ${data.subscription?.tier === 'free' ? styles.currentPlan : ''}`}>
-                <div className={styles.planHeader}>
-                  <h3>Free</h3>
-                  <div className={styles.planPrice}>$0/month</div>
-                </div>
-                <ul className={styles.planFeatures}>
-                  <li>2 appointments per month</li>
-                  <li>Basic medical record access</li>
-                  <li>Standard support</li>
-                  <li className={styles.notIncluded}>No telehealth</li>
-                  <li className={styles.notIncluded}>No priority booking</li>
-                </ul>
-                {data.subscription?.tier === 'free' && (
-                  <div className={styles.currentPlanBadge}>Current Plan</div>
-                )}
-              </div>
-
-              {/* Basic Plan */}
-              <div className={`${styles.planCard} ${data.subscription?.tier === 'basic' ? styles.currentPlan : styles.recommended}`}>
-                <div className={styles.planHeader}>
-                  <h3>Basic</h3>
-                  <div className={styles.planPrice}>$9.99/month</div>
-                  {data.subscription?.tier === 'free' && (
-                    <div className={styles.recommendedBadge}>Recommended</div>
-                  )}
-                </div>
-                <ul className={styles.planFeatures}>
-                  <li>5 appointments per month</li>
-                  <li>Priority booking</li>
-                  <li>Email reminders</li>
-                  <li>Telehealth appointments</li>
-                  <li>Basic analytics</li>
-                </ul>
-                {data.subscription?.tier === 'basic' ? (
-                  <div className={styles.currentPlanBadge}>Current Plan</div>
-                ) : (
-                  <button 
-                    className={styles.selectPlanButton}
-                    onClick={() => {
-                      handleUpgrade('basic');
-                      setShowUpgradeModal(false);
-                    }}
-                  >
-                    Upgrade to Basic
-                  </button>
-                )}
-              </div>
-
-              {/* Premium Plan */}
-              <div className={`${styles.planCard} ${data.subscription?.tier === 'premium' ? styles.currentPlan : ''}`}>
-                <div className={styles.planHeader}>
-                  <h3>Premium</h3>
-                  <div className={styles.planPrice}>$19.99/month</div>
-                  {data.subscription?.tier !== 'premium' && (
-                    <div className={styles.bestValueBadge}>Best Value</div>
-                  )}
-                </div>
-                <ul className={styles.planFeatures}>
-                  <li>Unlimited appointments</li>
-                  <li>Advanced medical analytics</li>
-                  <li>24/7 support</li>
-                  <li>Family account sharing</li>
-                  <li>All Basic features</li>
-                </ul>
-                {data.subscription?.tier === 'premium' ? (
-                  <div className={styles.currentPlanBadge}>Current Plan</div>
-                ) : (
-                  <button 
-                    className={styles.selectPlanButton}
-                    onClick={() => {
-                      handleUpgrade('premium');
-                      setShowUpgradeModal(false);
-                    }}
-                  >
-                    Upgrade to Premium
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Book Appointment Modal */}
+      {/* Modals */}
       <BookAppointmentModal
         isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
         onSuccess={handleBookingSuccess}
+      />
+
+      <SubscriptionsModal
+        isOpen={showSubscriptionsModal}
+        onClose={() => setShowSubscriptionsModal(false)}
+        currentTier={data.subscription?.tier || 'free'}
+        onUpgrade={handleUpgrade}
       />
 
       {/* Notification */}

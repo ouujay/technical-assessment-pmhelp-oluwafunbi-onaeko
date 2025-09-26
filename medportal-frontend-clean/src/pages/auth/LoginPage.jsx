@@ -220,7 +220,7 @@ const LoginPage = () => {
       {/* Right Side - Illustration */}
       <div className={styles.authImageSide}>
         <img
-          src="/src/assets/20250924_0547_Medical Login Design_simple_compose_01k5x0ppaeer59ew9jc6gjsndm.png"
+          src="https://i.pinimg.com/736x/16/98/84/1698841ddc24a030fb14a1e61a1c5d5c.jpg"
           alt="Medical professionals illustration"
           className={styles.authIllustration}
           onError={(e) => {

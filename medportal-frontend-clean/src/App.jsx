@@ -1,4 +1,4 @@
-// src/App.jsx
+// src/App.jsx - Updated with new patient routes
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -10,8 +10,10 @@ import DoctorDashboard from './pages/dashboard/DoctorDashboard';
 import AdminDashboard from './pages/dashboard/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import SubscriptionManagement from './pages/admin/SubscriptionManagement';
-import { useAuth } from './contexts/AuthContext';
 import AppointmentsPage from './pages/doctor/AppointmentsPage';
+import PatientAppointmentsPage from './pages/patient/PatientAppointmentsPage';
+import PatientRecordsPage from './pages/patient/PatientRecordsPage';
+import { useAuth } from './contexts/AuthContext';
 
 function App() {
   return (
@@ -34,7 +36,7 @@ function App() {
               } 
             />
             
-            {/* Role-specific Dashboard Routes */}
+            {/* Patient Routes */}
             <Route 
               path="/patient-dashboard" 
               element={
@@ -45,6 +47,25 @@ function App() {
             />
             
             <Route 
+              path="/patient/appointments" 
+              element={
+                <ProtectedRoute roles={['patient']}>
+                  <PatientAppointmentsPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/patient/records" 
+              element={
+                <ProtectedRoute roles={['patient']}>
+                  <PatientRecordsPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Doctor Routes */}
+            <Route 
               path="/doctor-dashboard" 
               element={
                 <ProtectedRoute roles={['doctor']}>
@@ -52,7 +73,17 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+
+            <Route 
+              path="/doctor/appointments" 
+              element={
+                <ProtectedRoute roles={['doctor']}>
+                  <AppointmentsPage />
+                </ProtectedRoute>
+              } 
+            />
             
+            {/* Admin Routes */}
             <Route 
               path="/admin-dashboard" 
               element={
@@ -62,7 +93,6 @@ function App() {
               } 
             />
 
-            {/* Admin Management Routes */}
             <Route 
               path="/admin/users" 
               element={
@@ -72,14 +102,6 @@ function App() {
               } 
             />
 
-              <Route 
-                path="/doctor/appointments" 
-                element={
-                  <ProtectedRoute roles={['doctor']}>
-                    <AppointmentsPage />
-                  </ProtectedRoute>
-                } 
-              />
             <Route 
               path="/admin/subscriptions" 
               element={

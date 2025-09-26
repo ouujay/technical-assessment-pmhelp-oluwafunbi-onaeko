@@ -207,7 +207,7 @@ const AdminDashboard = () => {
               {/* Admin Illustration - IMAGE KEPT */}
               <div className={styles.heroIllustration}>
                 <img 
-                  src="/src/assets/20250925_1242_Futuristic Admin Dashboard_simple_compose_01k60asx18evfa0w5zs2tygh92 (1).png"
+                  src="https://i.pinimg.com/736x/6e/b9/cc/6eb9ccbb0c8554b28e5a5222c8957b6a.jpg"
                   alt="Admin Dashboard"
                   className={styles.adminImage}
                   onError={(e) => {

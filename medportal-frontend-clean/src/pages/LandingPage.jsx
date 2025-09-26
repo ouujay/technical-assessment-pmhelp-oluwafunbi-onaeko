@@ -67,7 +67,7 @@ const LandingPage = () => {
           <div className={styles.primaryHeroRight}>
             <div className={styles.medicalIllustration}>
               <img 
-                src="/src/assets/ChatGPT Image Sep 23, 2025, 08_27_56 PM.png" 
+                src="https://i.pinimg.com/736x/51/59/6d/51596d5822b841c6fc7a14ea20c8a42a.jpg" 
                 alt="Medical consultation illustration"
                 onError={(e) => {
                   e.target.style.display = 'none';
@@ -93,7 +93,7 @@ const LandingPage = () => {
             <div className={styles.imageCard}>
               <div className={styles.profileImage}>
                 <img 
-                  src="/src/assets/alex-starnes-WYE2UhXsU1Y-unsplash.jpg" 
+                  src="https://i.pinimg.com/736x/e1/dd/c6/e1ddc6dada8fa5b0e61f03ed298f36ea.jpg" 
                   alt="Happy healthcare professional"
                   onError={(e) => {
                     e.target.style.display = 'none';

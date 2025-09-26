@@ -311,7 +311,7 @@ const DoctorDashboard = () => {
                   
                   <div className={styles.heroIllustration}>
                     <img 
-                      src="/src/assets/20250925_1241_Medical Dashboard Interaction_simple_compose_01k60ar9mqfe28yvnmb9bpvkce.png"
+                      src="https://i.pinimg.com/736x/1f/4a/37/1f4a3764f0601787820b45d074668da8.jpg"
                       alt="Medical Dashboard"
                       className={styles.doctorImage}
                       onError={(e) => {
