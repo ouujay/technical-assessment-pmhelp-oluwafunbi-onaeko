@@ -1,4 +1,4 @@
-// src/services/api.js - Hardcoded Production URL
+// src/services/api.js - Fixed with trailing slashes
 import axios from 'axios';
 
 // HARDCODED - No environment variables
@@ -61,23 +61,23 @@ api.interceptors.response.use(
   }
 );
 
-// Auth API
+// Auth API - WITH TRAILING SLASHES
 export const authService = {
-  login: (credentials) => authAPI.post('/api/auth/login', credentials),
-  register: (userData) => authAPI.post('/api/auth/register', userData),
-  getMe: () => api.get('/api/auth/me'),
-  refreshToken: (refreshToken) => authAPI.post('/api/auth/refresh', { refresh: refreshToken })
+  login: (credentials) => authAPI.post('/api/auth/login/', credentials),
+  register: (userData) => authAPI.post('/api/auth/register/', userData),
+  getMe: () => api.get('/api/auth/me/'),
+  refreshToken: (refreshToken) => authAPI.post('/api/auth/refresh/', { refresh: refreshToken })
 };
 
-// Subscription API
+// Subscription API - WITH TRAILING SLASHES
 export const subscriptionService = {
-  getCurrent: () => api.get('/api/subscriptions/current'),
-  upgrade: (planData) => api.post('/api/subscriptions/upgrade', planData)
+  getCurrent: () => api.get('/api/subscriptions/current/'),
+  upgrade: (planData) => api.post('/api/subscriptions/upgrade/', planData)
 };
 
-// Appointment API
+// Appointment API - WITH TRAILING SLASHES
 export const appointmentService = {
-  getMyAppointments: () => api.get('/api/appointments/my'),
+  getMyAppointments: () => api.get('/api/appointments/my/'),
   bookAppointment: (appointmentData) => {
     const bookingData = {
       doctor: appointmentData.doctor,
@@ -85,34 +85,34 @@ export const appointmentService = {
       end: appointmentData.end,
       visit_type: appointmentData.visit_type || 'in_person'
     };
-    return api.post('/api/appointments/my', bookingData);
+    return api.post('/api/appointments/my/', bookingData);
   },
-  cancelAppointment: (appointmentId) => api.patch(`/api/appointments/my/${appointmentId}`, { status: 'canceled' }),
-  getDoctorAppointments: () => api.get('/api/appointments'),
-  updateAppointmentStatus: (appointmentId, status) => api.patch(`/api/appointments/${appointmentId}`, { status }),
+  cancelAppointment: (appointmentId) => api.patch(`/api/appointments/my/${appointmentId}/`, { status: 'canceled' }),
+  getDoctorAppointments: () => api.get('/api/appointments/'),
+  updateAppointmentStatus: (appointmentId, status) => api.patch(`/api/appointments/${appointmentId}/`, { status }),
   getDoctorSlots: (doctorId, date) => {
     const formattedDate = date instanceof Date ? 
       date.toISOString().split('T')[0] : date;
-    return api.get(`/api/doctors/${doctorId}/slots?date=${formattedDate}`);
+    return api.get(`/api/doctors/${doctorId}/slots/?date=${formattedDate}`);
   },
-  getDoctors: () => api.get('/api/doctors'),
-  getDoctor: (doctorId) => api.get(`/api/doctors/${doctorId}`)
+  getDoctors: () => api.get('/api/doctors/'),
+  getDoctor: (doctorId) => api.get(`/api/doctors/${doctorId}/`)
 };
 
-// Medical Records API
+// Medical Records API - WITH TRAILING SLASHES
 export const recordsService = {
-  getMyRecords: () => api.get('/api/medical-records/my'),
-  getPatientRecords: (patientId) => api.get(`/api/patients/${patientId}/records`),
-  createRecord: (patientId, recordData) => api.post(`/api/patients/${patientId}/records`, recordData)
+  getMyRecords: () => api.get('/api/medical-records/my/'),
+  getPatientRecords: (patientId) => api.get(`/api/patients/${patientId}/records/`),
+  createRecord: (patientId, recordData) => api.post(`/api/patients/${patientId}/records/`, recordData)
 };
 
-// Analytics API
+// Analytics API - WITH TRAILING SLASHES
 export const analyticsService = {
-  getDoctorAnalytics: (period = 'month') => api.get(`/api/analytics/practice?period=${period}`),
+  getDoctorAnalytics: (period = 'month') => api.get(`/api/analytics/practice/?period=${period}`),
   getSystemAnalytics: () => api.get('/api/admin/analytics/')
 };
 
-// Admin API
+// Admin API - WITH TRAILING SLASHES
 export const adminService = {
   // User Management
   getUsers: (params = {}) => api.get('/api/admin/users/', { params }),
