@@ -1,6 +1,6 @@
 # medportal/settings.py
 """
-Django settings for medportal project.
+Django settings for medportal project - Azure Production
 """
 import os
 from datetime import timedelta
@@ -10,14 +10,27 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ujmlbunlc7(_2k$4w-z5mgv&*j73ev1%=^7%vzz#57++^en_rs'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-ujmlbunlc7(_2k$4w-z5mgv&*j73ev1%=^7%vzz#57++^en_rs')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-# Fixed ALLOWED_HOSTS to include localhost and 127.0.0.1
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '*']
+# Azure deployment host
+ALLOWED_HOSTS = [
+    'pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net',
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+    '*'
+]
+# At the end of settings.py, or near the security-related settings
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net',
+    'http://localhost',
+    'http://127.0.0.1',
+    'http://0.0.0.0',
+]
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -30,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'django_filters',  # CRITICAL: Must be here!
     # Local apps
     'accounts',
     'subscriptions',
@@ -39,7 +53,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Must be at the top
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,7 +63,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Disable automatic slash appending to allow flexibility with trailing slashes
 APPEND_SLASH = False
 
 ROOT_URLCONF = 'medportal.urls'
@@ -119,18 +132,9 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-# CORS Settings - Allow frontend to connect
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:5173",  # Vite default port
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-]
-
-CORS_ALLOW_CREDENTIALS = True
-
-# For development only - remove in production
+# CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
@@ -138,12 +142,28 @@ TIME_ZONE = "Africa/Lagos"
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = "static/"
-# Commented out to avoid warning about non-existent directory
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static",
-# ]
+# Static files
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
