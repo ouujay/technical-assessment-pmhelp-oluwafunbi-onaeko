@@ -1,4 +1,4 @@
-# medportalbackend/medportal/urls.py - COMPLETE WITH ALL FIXES
+# medportalbackend/medportal/urls.py - FIXED WITH TRAILING SLASHES
 
 from django.contrib import admin
 from django.urls import path
@@ -17,53 +17,37 @@ from analytics.views import DoctorAnalytics, SystemAnalytics
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    # ============= API ENDPOINTS (WITH TRAILING SLASHES) =============
+    
     # Auth endpoints
-    path("auth/register", Register.as_view()),
-    path("auth/register/", Register.as_view()),
-    path("auth/login", TokenObtainPairView.as_view()),
-    path("auth/login/", TokenObtainPairView.as_view()),
-    path("auth/refresh", TokenRefreshView.as_view()),
-    path("auth/refresh/", TokenRefreshView.as_view()),
-    path("auth/me", Me.as_view()),
-    path("auth/me/", Me.as_view()),
+    path("api/auth/register/", Register.as_view()),
+    path("api/auth/login/", TokenObtainPairView.as_view()),
+    path("api/auth/refresh/", TokenRefreshView.as_view()),
+    path("api/auth/me/", Me.as_view()),
 
     # Subscriptions
-    path("subscriptions/current", CurrentSubscription.as_view()),
-    path("subscriptions/current/", CurrentSubscription.as_view()),
-    path("subscriptions/upgrade", Upgrade.as_view()),
-    path("subscriptions/upgrade/", Upgrade.as_view()),
+    path("api/subscriptions/current/", CurrentSubscription.as_view()),
+    path("api/subscriptions/upgrade/", Upgrade.as_view()),
 
     # Doctors
-    path("doctors/<int:doctor_id>/slots", DoctorSlots.as_view()),
-    path("doctors/<int:doctor_id>/slots/", DoctorSlots.as_view()),
-    path("doctors", DoctorsList.as_view()),
-    path("doctors/", DoctorsList.as_view()),
+    path("api/doctors/<int:doctor_id>/slots/", DoctorSlots.as_view()),
+    path("api/doctors/", DoctorsList.as_view()),
 
     # Appointments
-    path("appointments/my", MyAppointments.as_view()),
-    path("appointments/my/", MyAppointments.as_view()),
-    path("appointments", DoctorAppointments.as_view()),
-    path("appointments/", DoctorAppointments.as_view()),
-    path("appointments/<int:appointment_id>", AppointmentDetail.as_view()),
-    path("appointments/<int:appointment_id>/", AppointmentDetail.as_view()),
+    path("api/appointments/my/", MyAppointments.as_view()),
+    path("api/appointments/my/<int:appointment_id>/", MyAppointments.as_view()),
+    path("api/appointments/", DoctorAppointments.as_view()),
+    path("api/appointments/<int:appointment_id>/", AppointmentDetail.as_view()),
 
     # Medical Records
-    path("medical-records/my", MyRecords.as_view()),
-    path("medical-records/my/", MyRecords.as_view()),
-    path("patients/<int:patient_id>/records", PatientRecords.as_view()),
-    path("patients/<int:patient_id>/records/", PatientRecords.as_view()),
+    path("api/medical-records/my/", MyRecords.as_view()),
+    path("api/patients/<int:patient_id>/records/", PatientRecords.as_view()),
 
-    # ============= ANALYTICS ENDPOINTS =============
-    
-    # Doctor Analytics
-    path("analytics/practice", DoctorAnalytics.as_view()),
-    path("analytics/practice/", DoctorAnalytics.as_view()),
-    
-    # System Analytics (for admin)
-    path("analytics/system", SystemAnalytics.as_view()),
-    path("analytics/system/", SystemAnalytics.as_view()),
+    # Analytics
+    path("api/analytics/practice/", DoctorAnalytics.as_view()),
+    path("api/analytics/system/", SystemAnalytics.as_view()),
 
-    # ============= ADMIN ENDPOINTS =============
+    # ============= ADMIN ENDPOINTS (WITH TRAILING SLASHES) =============
     
     # User Management
     path('api/admin/users/', admin_views.admin_users_management),

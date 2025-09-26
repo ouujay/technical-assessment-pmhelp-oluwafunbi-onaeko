@@ -13,24 +13,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-ujmlbunlc7(_2k$4w-z5mgv&*j73ev1%=^7%vzz#57++^en_rs')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Azure deployment host
+# Azure deployment host - HARDCODED
 ALLOWED_HOSTS = [
     'pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net',
+    'technical-assessment-pmhelp-oluwafu-lemon.vercel.app',
     'localhost',
     '127.0.0.1',
     '0.0.0.0',
-    '*'
+    '*'  # Allow all for now, narrow down later
 ]
-# At the end of settings.py, or near the security-related settings
 
+# CSRF Trusted Origins - HARDCODED
 CSRF_TRUSTED_ORIGINS = [
     'https://pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net',
-    'http://localhost',
-    'http://127.0.0.1',
-    'http://0.0.0.0',
+    'https://technical-assessment-pmhelp-oluwafu-lemon.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
 ]
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -43,7 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    'django_filters',  # CRITICAL: Must be here!
+    'django_filters',
     # Local apps
     'accounts',
     'subscriptions',
@@ -132,9 +135,48 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-# CORS Settings
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS Settings - HARDCODED for Production
+CORS_ALLOWED_ORIGINS = [
+    'https://pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net',
+    'https://technical-assessment-pmhelp-oluwafu-lemon.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+]
+
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Security Settings for Production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
