@@ -11,6 +11,7 @@ import AdminDashboard from './pages/dashboard/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import SubscriptionManagement from './pages/admin/SubscriptionManagement';
 import { useAuth } from './contexts/AuthContext';
+import AppointmentsPage from './pages/doctor/AppointmentsPage';
 
 function App() {
   return (
@@ -71,6 +72,14 @@ function App() {
               } 
             />
 
+              <Route 
+                path="/doctor/appointments" 
+                element={
+                  <ProtectedRoute roles={['doctor']}>
+                    <AppointmentsPage />
+                  </ProtectedRoute>
+                } 
+              />
             <Route 
               path="/admin/subscriptions" 
               element={

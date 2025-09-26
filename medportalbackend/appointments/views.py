@@ -108,3 +108,32 @@ class DoctorsList(APIView):
             })
         
         return Response(doctors_data)
+
+class AppointmentDetail(APIView):
+    """Update appointment status - for doctors"""
+    permission_classes = [IsDoctor]
+    
+    def patch(self, request, appointment_id):
+        try:
+            appointment = Appointment.objects.get(id=appointment_id, doctor=request.user)
+        except Appointment.DoesNotExist:
+            return Response(
+                {"error": "Appointment not found or you don't have permission"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        new_status = request.data.get('status')
+        
+        if new_status not in ['scheduled', 'completed', 'canceled']:
+            return Response(
+                {"error": "Invalid status. Must be: scheduled, completed, or canceled"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        appointment.status = new_status
+        appointment.save()
+        
+        return Response(
+            AppointmentSerializer(appointment).data,
+            status=status.HTTP_200_OK
+        )

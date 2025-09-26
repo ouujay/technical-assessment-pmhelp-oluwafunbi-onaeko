@@ -1,11 +1,11 @@
-# medportal/urls.py - COMPLETE WITH ANALYTICS
+# medportalbackend/medportal/urls.py - COMPLETE WITH ALL FIXES
 
 from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from accounts.views import Register, Me
 from subscriptions.views import CurrentSubscription, Upgrade
-from appointments.views import DoctorSlots, MyAppointments, DoctorAppointments, DoctorsList
+from appointments.views import DoctorSlots, MyAppointments, DoctorAppointments, DoctorsList, AppointmentDetail
 from records.views import MyRecords, PatientRecords
 
 # Import admin views
@@ -44,6 +44,8 @@ urlpatterns = [
     path("appointments/my/", MyAppointments.as_view()),
     path("appointments", DoctorAppointments.as_view()),
     path("appointments/", DoctorAppointments.as_view()),
+    path("appointments/<int:appointment_id>", AppointmentDetail.as_view()),
+    path("appointments/<int:appointment_id>/", AppointmentDetail.as_view()),
 
     # Medical Records
     path("medical-records/my", MyRecords.as_view()),

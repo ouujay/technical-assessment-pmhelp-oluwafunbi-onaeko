@@ -255,7 +255,13 @@ const DoctorDashboard = () => {
               ].map(({ id, icon: Icon, label }) => (
                 <button
                   key={id}
-                  onClick={() => setActiveTab(id)}
+                  onClick={() => {
+                    if (id === 'appointments') {
+                      window.location.href = '/doctor/appointments';
+                    } else {
+                      setActiveTab(id);
+                    }
+                  }}
                   className={`${styles.navButton} ${activeTab === id ? styles.navButtonActive : ''}`}
                 >
                   <Icon className={styles.navIcon} />
@@ -723,7 +729,7 @@ const DoctorDashboard = () => {
                   <Plus className={styles.actionIcon} />
                   <span>Add Medical Record</span>
                 </button>
-                <button className={styles.actionButtonLarge} onClick={() => setActiveTab('appointments')}>
+                <button className={styles.actionButtonLarge} onClick={() => window.location.href = '/doctor/appointments'}>
                   <Calendar className={styles.actionIcon} />
                   <span>View Appointments</span>
                 </button>
