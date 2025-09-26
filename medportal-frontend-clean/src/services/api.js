@@ -1,9 +1,10 @@
-// src/services/api.js - Production Configuration
+// src/services/api.js - Hardcoded Production URL
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net';
+// HARDCODED - No environment variables
+const BASE_URL = 'https://pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net';
 
-console.log('API Base URL:', BASE_URL); // For debugging
+console.log('🔗 API Base URL:', BASE_URL);
 
 export const authAPI = axios.create({
   baseURL: BASE_URL,
@@ -26,17 +27,21 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log('📤 Request:', config.method.toUpperCase(), config.url);
     return config;
   },
   (error) => {
-    console.error('Request error:', error);
+    console.error('❌ Request error:', error);
     return Promise.reject(error);
   }
 );
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ Response:', response.status, response.config.url);
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('medportal_token');
@@ -44,12 +49,12 @@ api.interceptors.response.use(
       window.location.href = '/login';
     }
     
-    // Log error for debugging
-    console.error('API Error:', {
+    console.error('❌ API Error:', {
       url: error.config?.url,
       method: error.config?.method,
       status: error.response?.status,
       data: error.response?.data,
+      message: error.message
     });
     
     return Promise.reject(error);
@@ -58,21 +63,21 @@ api.interceptors.response.use(
 
 // Auth API
 export const authService = {
-  login: (credentials) => authAPI.post('/auth/login', credentials),
-  register: (userData) => authAPI.post('/auth/register', userData),
-  getMe: () => api.get('/auth/me'),
-  refreshToken: (refreshToken) => authAPI.post('/auth/refresh', { refresh: refreshToken })
+  login: (credentials) => authAPI.post('/api/auth/login', credentials),
+  register: (userData) => authAPI.post('/api/auth/register', userData),
+  getMe: () => api.get('/api/auth/me'),
+  refreshToken: (refreshToken) => authAPI.post('/api/auth/refresh', { refresh: refreshToken })
 };
 
 // Subscription API
 export const subscriptionService = {
-  getCurrent: () => api.get('/subscriptions/current'),
-  upgrade: (planData) => api.post('/subscriptions/upgrade', planData)
+  getCurrent: () => api.get('/api/subscriptions/current'),
+  upgrade: (planData) => api.post('/api/subscriptions/upgrade', planData)
 };
 
 // Appointment API
 export const appointmentService = {
-  getMyAppointments: () => api.get('/appointments/my'),
+  getMyAppointments: () => api.get('/api/appointments/my'),
   bookAppointment: (appointmentData) => {
     const bookingData = {
       doctor: appointmentData.doctor,
@@ -80,41 +85,85 @@ export const appointmentService = {
       end: appointmentData.end,
       visit_type: appointmentData.visit_type || 'in_person'
     };
-    return api.post('/appointments/my', bookingData);
+    return api.post('/api/appointments/my', bookingData);
   },
-  cancelAppointment: (appointmentId) => api.patch(`/appointments/my/${appointmentId}`, { status: 'canceled' }),
-  getDoctorAppointments: () => api.get('/appointments'),
-  updateAppointmentStatus: (appointmentId, status) => api.patch(`/appointments/${appointmentId}`, { status }),
+  cancelAppointment: (appointmentId) => api.patch(`/api/appointments/my/${appointmentId}`, { status: 'canceled' }),
+  getDoctorAppointments: () => api.get('/api/appointments'),
+  updateAppointmentStatus: (appointmentId, status) => api.patch(`/api/appointments/${appointmentId}`, { status }),
   getDoctorSlots: (doctorId, date) => {
     const formattedDate = date instanceof Date ? 
       date.toISOString().split('T')[0] : date;
-    return api.get(`/appointments/slots/${doctorId}?date=${formattedDate}`);
-  }
+    return api.get(`/api/doctors/${doctorId}/slots?date=${formattedDate}`);
+  },
+  getDoctors: () => api.get('/api/doctors'),
+  getDoctor: (doctorId) => api.get(`/api/doctors/${doctorId}`)
 };
 
 // Medical Records API
-export const recordService = {
-  getMyRecords: () => api.get('/records/my'),
-  getRecordDetail: (recordId) => api.get(`/records/my/${recordId}`),
-  getAllRecords: () => api.get('/records'),
-  createRecord: (recordData) => api.post('/records', recordData),
-  updateRecord: (recordId, recordData) => api.patch(`/records/${recordId}`, recordData),
-  deleteRecord: (recordId) => api.delete(`/records/${recordId}`)
+export const recordsService = {
+  getMyRecords: () => api.get('/api/medical-records/my'),
+  getPatientRecords: (patientId) => api.get(`/api/patients/${patientId}/records`),
+  createRecord: (patientId, recordData) => api.post(`/api/patients/${patientId}/records`, recordData)
 };
 
 // Analytics API
 export const analyticsService = {
-  getOverview: () => api.get('/analytics/overview'),
-  getRevenue: (params) => api.get('/analytics/revenue', { params }),
-  getAppointmentStats: (params) => api.get('/analytics/appointments', { params })
+  getDoctorAnalytics: (period = 'month') => api.get(`/api/analytics/practice?period=${period}`),
+  getSystemAnalytics: () => api.get('/api/admin/analytics/')
 };
 
 // Admin API
 export const adminService = {
-  getUsers: (params) => api.get('/admin/users', { params }),
-  getUserDetail: (userId) => api.get(`/admin/users/${userId}`),
-  updateUser: (userId, userData) => api.patch(`/admin/users/${userId}`, userData),
-  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
-  getDoctors: () => api.get('/admin/doctors'),
-  createDoctor: (doctorData) => api.post('/admin/doctors', doctorData)
+  // User Management
+  getUsers: (params = {}) => api.get('/api/admin/users/', { params }),
+  getUserDetail: (userId) => api.get(`/api/admin/users/${userId}/`),
+  createUser: (userData) => api.post('/api/admin/users/', userData),
+  updateUser: (userId, userData) => api.put(`/api/admin/users/${userId}/`, userData),
+  deleteUser: (userId) => api.delete(`/api/admin/users/${userId}/`),
+  
+  // Analytics
+  getAnalytics: () => api.get('/api/admin/analytics/'),
+  
+  // Subscription Plans
+  getSubscriptionPlans: () => api.get('/api/admin/subscription-plans/'),
+  getSubscriptionPlan: (planId) => api.get(`/api/admin/subscription-plans/${planId}/`),
+  createSubscriptionPlan: (planData) => api.post('/api/admin/subscription-plans/', planData),
+  updateSubscriptionPlan: (planId, planData) => api.put(`/api/admin/subscription-plans/${planId}/`, planData),
+  deleteSubscriptionPlan: (planId) => api.delete(`/api/admin/subscription-plans/${planId}/`),
+  
+  // User Subscriptions
+  assignUserSubscription: (userId, plan) => 
+    api.post(`/api/admin/users/${userId}/subscription/`, { action: 'assign', plan }),
+  cancelUserSubscription: (userId) => 
+    api.post(`/api/admin/users/${userId}/subscription/`, { action: 'cancel' }),
+  applyDiscount: (userId, discountPercent) => 
+    api.post(`/api/admin/users/${userId}/subscription/`, { 
+      action: 'discount', 
+      discount_percent: discountPercent 
+    })
+};
+
+// Utility functions
+export const handleApiError = (error) => {
+  if (error.response?.data?.detail) {
+    return error.response.data.detail;
+  }
+  if (error.response?.data?.message) {
+    return error.response.data.message;
+  }
+  if (error.response?.data?.error) {
+    return error.response.data.error;
+  }
+  if (error.message) {
+    return error.message;
+  }
+  return 'An unexpected error occurred';
+};
+
+export const formatApiResponse = (response) => {
+  return {
+    data: response.data,
+    status: response.status,
+    success: response.status >= 200 && response.status < 300
+  };
 };
