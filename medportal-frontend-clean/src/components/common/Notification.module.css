@@ -1,0 +1,121 @@
+/* src/components/common/Notification.module.css */
+
+.notification {
+  position: fixed;
+  top: var(--spacing-xl);
+  right: var(--spacing-xl);
+  z-index: 1100;
+  min-width: 300px;
+  max-width: 500px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-large);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.message {
+  flex: 1;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  margin-top: -2px;
+}
+
+/* Success notification */
+.success {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+
+.success .icon {
+  color: #16A34A;
+}
+
+.success .closeButton {
+  color: #166534;
+}
+
+.success .closeButton:hover {
+  background: #DCFCE7;
+}
+
+/* Error notification */
+.error {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+.error .icon {
+  color: #EF4444;
+}
+
+.error .closeButton {
+  color: #991B1B;
+}
+
+.error .closeButton:hover {
+  background: #FEE2E2;
+}
+
+/* Info notification */
+.info {
+  background: #EFF6FF;
+  border: 1px solid #DBEAFE;
+  color: #1E40AF;
+}
+
+.info .icon {
+  color: #3B82F6;
+}
+
+.info .closeButton {
+  color: #1E40AF;
+}
+
+.info .closeButton:hover {
+  background: #E0E7FF;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .notification {
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    left: var(--spacing-md);
+    min-width: auto;
+    max-width: none;
+  }
+}
