@@ -1,16 +1,22 @@
-// src/services/api.js - UPDATED with full admin functionality
+// src/services/api.js - Production Configuration
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net';
+
+console.log('API Base URL:', BASE_URL); // For debugging
 
 export const authAPI = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
+  timeout: 30000,
 });
 
 export const api = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
+  timeout: 30000,
 });
 
 // Request interceptor
@@ -22,7 +28,10 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error('Request error:', error);
+    return Promise.reject(error);
+  }
 );
 
 // Response interceptor
@@ -34,6 +43,15 @@ api.interceptors.response.use(
       localStorage.removeItem('medportal_user');
       window.location.href = '/login';
     }
+    
+    // Log error for debugging
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    
     return Promise.reject(error);
   }
 );
@@ -68,91 +86,35 @@ export const appointmentService = {
   getDoctorAppointments: () => api.get('/appointments'),
   updateAppointmentStatus: (appointmentId, status) => api.patch(`/appointments/${appointmentId}`, { status }),
   getDoctorSlots: (doctorId, date) => {
-    const formattedDate = date instanceof Date ? date.toISOString().split('T')[0] : date;
-    return api.get(`/doctors/${doctorId}/slots?date=${formattedDate}`);
-  },
-  getDoctors: () => api.get('/doctors'),
-  getDoctor: (doctorId) => api.get(`/doctors/${doctorId}`)
+    const formattedDate = date instanceof Date ? 
+      date.toISOString().split('T')[0] : date;
+    return api.get(`/appointments/slots/${doctorId}?date=${formattedDate}`);
+  }
 };
 
 // Medical Records API
-export const recordsService = {
-  getMyRecords: () => api.get('/medical-records/my'),
-  getPatientRecords: (patientId) => api.get(`/patients/${patientId}/records`),
-  createRecord: (patientId, recordData) => api.post(`/patients/${patientId}/records`, recordData)
+export const recordService = {
+  getMyRecords: () => api.get('/records/my'),
+  getRecordDetail: (recordId) => api.get(`/records/my/${recordId}`),
+  getAllRecords: () => api.get('/records'),
+  createRecord: (recordData) => api.post('/records', recordData),
+  updateRecord: (recordId, recordData) => api.patch(`/records/${recordId}`, recordData),
+  deleteRecord: (recordId) => api.delete(`/records/${recordId}`)
 };
 
 // Analytics API
 export const analyticsService = {
-  getDoctorAnalytics: (period = 'month') => api.get(`/analytics/practice?period=${period}`),
-  getSystemAnalytics: () => api.get('/api/admin/analytics/')
+  getOverview: () => api.get('/analytics/overview'),
+  getRevenue: (params) => api.get('/analytics/revenue', { params }),
+  getAppointmentStats: (params) => api.get('/analytics/appointments', { params })
 };
 
-// ============= ENHANCED ADMIN API =============
-
+// Admin API
 export const adminService = {
-  // User Management - Full CRUD
-  getUsers: (params = {}) => {
-    return api.get('/api/admin/users/', { params });
-  },
-  
-  getUserDetail: (userId) => api.get(`/api/admin/users/${userId}/`),
-  
-  createUser: (userData) => api.post('/api/admin/users/', userData),
-  
-  updateUser: (userId, userData) => api.put(`/api/admin/users/${userId}/`, userData),
-  
-  deleteUser: (userId) => api.delete(`/api/admin/users/${userId}/`),
-  
-  // Analytics
-  getAnalytics: () => api.get('/api/admin/analytics/'),
-  
-  // Subscription Plans Management
-  getSubscriptionPlans: () => api.get('/api/admin/subscription-plans/'),
-  
-  getSubscriptionPlan: (planId) => api.get(`/api/admin/subscription-plans/${planId}/`),
-  
-  createSubscriptionPlan: (planData) => api.post('/api/admin/subscription-plans/', planData),
-  
-  updateSubscriptionPlan: (planId, planData) => api.put(`/api/admin/subscription-plans/${planId}/`, planData),
-  
-  deleteSubscriptionPlan: (planId) => api.delete(`/api/admin/subscription-plans/${planId}/`),
-  
-  // User Subscription Management
-  assignUserSubscription: (userId, plan) => 
-    api.post(`/api/admin/users/${userId}/subscription/`, { action: 'assign', plan }),
-  
-  cancelUserSubscription: (userId) => 
-    api.post(`/api/admin/users/${userId}/subscription/`, { action: 'cancel' }),
-  
-  applyDiscount: (userId, discountPercent) => 
-    api.post(`/api/admin/users/${userId}/subscription/`, { 
-      action: 'discount', 
-      discount_percent: discountPercent 
-    })
-};
-
-// Utility functions
-export const handleApiError = (error) => {
-  if (error.response?.data?.detail) {
-    return error.response.data.detail;
-  }
-  if (error.response?.data?.message) {
-    return error.response.data.message;
-  }
-  if (error.response?.data?.error) {
-    return error.response.data.error;
-  }
-  if (error.message) {
-    return error.message;
-  }
-  return 'An unexpected error occurred';
-};
-
-export const formatApiResponse = (response) => {
-  return {
-    data: response.data,
-    status: response.status,
-    success: response.status >= 200 && response.status < 300
-  };
+  getUsers: (params) => api.get('/admin/users', { params }),
+  getUserDetail: (userId) => api.get(`/admin/users/${userId}`),
+  updateUser: (userId, userData) => api.patch(`/admin/users/${userId}`, userData),
+  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
+  getDoctors: () => api.get('/admin/doctors'),
+  createDoctor: (doctorData) => api.post('/admin/doctors', doctorData)
 };
