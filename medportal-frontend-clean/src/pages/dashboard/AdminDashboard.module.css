@@ -172,6 +172,16 @@
   font-weight: var(--font-weight-semibold);
 }
 
+.logoutButton {
+  padding: var(--spacing-sm);
+  background: none;
+  border: none;
+  color: var(--text-light-gray);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
 .logoutButton:hover {
   color: #EF4444;
   background: #FEF2F2;
@@ -253,7 +263,7 @@
   gap: var(--spacing-xl);
 }
 
-/* Hero Section - Clean Medical Design (Same as Patient) */
+/* Hero Section - Clean Medical Design */
 .heroSection {
   background: var(--bg-white);
   border: 1px solid var(--border-light);
@@ -534,6 +544,22 @@
   color: var(--text-gray);
 }
 
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-light-gray);
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
 /* Right Sidebar */
 .rightSidebar {
   display: flex;
@@ -722,6 +748,59 @@
   background: var(--text-light-gray);
 }
 
+/* Notification */
+.notification {
+  position: fixed;
+  bottom: var(--spacing-xl);
+  right: var(--spacing-xl);
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-large);
+  padding: var(--spacing-lg);
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification[data-type="success"] {
+  border-left: 4px solid #16A34A;
+}
+
+.notification[data-type="error"] {
+  border-left: 4px solid #EF4444;
+}
+
+.notificationContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.notificationContent button {
+  background: none;
+  border: none;
+  color: var(--text-light-gray);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.notificationContent button:hover {
+  background: var(--bg-cream-light);
+  color: var(--text-dark);
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .dashboardGrid {
@@ -795,6 +874,15 @@
   .heroSection {
     padding: var(--spacing-lg);
     gap: var(--spacing-lg);
+    grid-template-columns: 1fr;
+  }
+  
+  .heroIllustration {
+    display: none;
+  }
+  
+  .heroContent {
+    text-align: left;
   }
   
   .heroTitle {
@@ -819,6 +907,12 @@
     overflow-x: auto;
     gap: var(--spacing-sm);
     padding-bottom: var(--spacing-sm);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .sidebar .sidebarNav::-webkit-scrollbar {
+    display: none;
   }
   
   .navButton {
@@ -827,61 +921,73 @@
   }
 }
 
-/* Additional mobile optimizations for smaller screens (e.g., phones under 480px) */
+/* Additional mobile optimizations for smaller screens */
 @media (max-width: 480px) {
   .headerContent {
     height: auto;
-    padding: var(--spacing-sm) var(--spacing-md);
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
 
   .logo {
-    margin-bottom: var(--spacing-sm);
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .logoText {
+    font-size: var(--text-lg);
   }
 
   .searchContainer {
-    margin: var(--spacing-sm) 0;
+    margin: var(--spacing-sm) 0 0 0;
   }
 
   .headerRight {
-    align-self: stretch;
-    justify-content: space-between;
-    gap: var(--spacing-md);
+    width: 100%;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  
+  .userProfile {
+    flex: 1;
   }
 
   .heroSection {
     padding: var(--spacing-md);
     gap: var(--spacing-md);
   }
+  
+  .heroIllustration {
+    display: none;
+  }
 
   .heroTitle {
     font-size: var(--text-lg);
+    margin-bottom: var(--spacing-sm);
   }
 
   .heroSubtitle {
     font-size: var(--text-sm);
+    margin-bottom: var(--spacing-lg);
   }
 
   .heroStats {
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
   }
 
   .heroStat {
-    text-align: center;
+    padding: var(--spacing-sm);
+    background: var(--bg-cream-light);
+    border-radius: var(--radius-md);
   }
-
-  .heroIllustration {
-    width: 150px;
-    height: 150px;
-    margin: 0 auto;
+  
+  .heroStatValue {
+    font-size: var(--text-xl);
   }
-
-  .adminImage {
-    width: 120px;
-    height: 120px;
+  
+  .heroStatLabel {
+    font-size: var(--text-xs);
   }
 
   .metricsGrid {
@@ -909,19 +1015,26 @@
   }
 
   .activityItem {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+  }
+
+  .activityIcon {
+    width: 36px;
+    height: 36px;
   }
 
   .activityMeta {
     flex-direction: column;
+    align-items: flex-start;
     gap: var(--spacing-xs);
   }
 
   .actionButtonLarge {
-    padding: var(--spacing-sm);
-    font-size: var(--text-xs);
+    padding: var(--spacing-md);
+  }
+  
+  .actionButtonLarge span {
+    font-size: var(--text-sm);
   }
 
   .sidebarNav {
@@ -929,12 +1042,34 @@
   }
 
   .navButton {
-    padding: var(--spacing-sm);
-    font-size: var(--text-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--text-sm);
   }
 
   .navIcon {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  .cardHeader {
+    padding: var(--spacing-lg);
+  }
+  
+  .cardContent {
+    padding: var(--spacing-lg);
+  }
+  
+  .statusList {
+    gap: var(--spacing-sm);
+  }
+  
+  .userItem {
+    padding: var(--spacing-xs);
+  }
+  
+  .notification {
+    bottom: var(--spacing-md);
+    right: var(--spacing-md);
+    left: var(--spacing-md);
   }
 }
