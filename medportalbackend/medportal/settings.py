@@ -19,19 +19,15 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = [
     'pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net',
     'technical-assessment-pmhelp-oluwafu-lemon.vercel.app',
-    'localhost',
-    '127.0.0.1',
-    '0.0.0.0',
-    '*'  # Allow all for now, narrow down later
+    
 ]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # CSRF Trusted Origins - HARDCODED
 CSRF_TRUSTED_ORIGINS = [
     'https://pmhelp-epegcmf5cmg2gmdd.southafricanorth-01.azurewebsites.net',
     'https://technical-assessment-pmhelp-oluwafu-lemon.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://127.0.0.1:5173',
+    
 ]
 
 # Application definition
@@ -66,8 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-APPEND_SLASH = False
-
+APPEND_SLASH = True
 ROOT_URLCONF = 'medportal.urls'
 
 TEMPLATES = [
