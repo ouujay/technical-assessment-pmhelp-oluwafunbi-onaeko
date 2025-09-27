@@ -504,7 +504,7 @@ Password: Timi1997april11
 
 **Free Tier Patient:**
 ```
-Username: sbnu
+Username: remi
 Password: Timi1997april11
 ```
 
