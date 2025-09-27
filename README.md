@@ -652,13 +652,10 @@ def check_appointment_limit(user):
 
 ### Backend Testing
 ```bash
-python manage.py test
+test.http
 ```
 
-### Frontend Testing
-```bash
-npm run test
-```
+
 
 **Note**: Unit tests are implemented for critical business logic including:
 - Subscription validation
@@ -675,6 +672,7 @@ npm run test
 3. **Real-time Updates**: No WebSocket implementation. Future: Add real-time appointment updates
 4. **File Uploads**: Medical documents upload not implemented
 5. **Mobile App**: Web-only. Future: React Native mobile app
+6. **Logout**: When you logout of an account you have to go the the home page so that you would have error or unauthorized page cause you have actually not fully logged out
 
 ---
 
