@@ -72,24 +72,49 @@ const PatientDashboard = () => {
     logout();
   };
 
-  const handleUpgrade = async (planType) => {
-    try {
-      await subscriptionService.upgrade({ plan: planType });
-      const subscriptionRes = await subscriptionService.getCurrent();
-      setData(prev => ({ ...prev, subscription: subscriptionRes.data }));
-      
-      setNotification({
-        type: 'success',
-        message: `Successfully upgraded to ${planType.charAt(0).toUpperCase() + planType.slice(1)} plan!`
-      });
-    } catch (err) {
-      console.error('Upgrade error:', err);
+const handleUpgrade = async (planType) => {
+  try {
+    // Don't allow "upgrading" to free plan
+    if (planType === 'free') {
       setNotification({
         type: 'error',
-        message: 'Failed to upgrade plan. Please try again.'
+        message: 'You are already on the free plan. Please select Basic or Premium to upgrade.'
       });
+      setShowSubscriptionsModal(false);
+      return;
     }
-  };
+
+    // Only allow basic or premium
+    if (!['basic', 'premium'].includes(planType)) {
+      setNotification({
+        type: 'error',
+        message: 'Please select a valid plan to upgrade.'
+      });
+      return;
+    }
+
+    await subscriptionService.upgrade({ plan: planType });
+    const subscriptionRes = await subscriptionService.getCurrent();
+    setData(prev => ({ ...prev, subscription: subscriptionRes.data }));
+    
+    setNotification({
+      type: 'success',
+      message: `Successfully upgraded to ${planType.charAt(0).toUpperCase() + planType.slice(1)} plan!`
+    });
+  } catch (err) {
+    console.error('Upgrade error:', err);
+    
+    // Better error handling
+    const errorMessage = err.response?.data?.detail || 
+                        err.response?.data?.message || 
+                        'Failed to upgrade plan. Please try again.';
+    
+    setNotification({
+      type: 'error',
+      message: errorMessage
+    });
+  }
+};
 
   const handleBookingAttempt = () => {
     const canBook = canBookAppointment();

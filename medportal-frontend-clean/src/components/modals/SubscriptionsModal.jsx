@@ -1,4 +1,4 @@
-// src/components/modals/SubscriptionsModal.jsx
+// src/components/modals/SubscriptionsModal.jsx - COMPLETE FIXED VERSION
 import React, { useState } from 'react';
 import { 
   X, 
@@ -10,7 +10,8 @@ import {
   Calendar,
   Video,
   Clock,
-  HeadphonesIcon
+  HeadphonesIcon,
+  Lock
 } from 'lucide-react';
 import styles from './SubscriptionsModal.module.css';
 
@@ -77,7 +78,13 @@ const SubscriptionsModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
   ];
 
   const handleUpgrade = async (planId) => {
+    // Don't allow selecting current plan
     if (planId === currentTier) {
+      return;
+    }
+
+    // Don't allow "upgrading" to free plan
+    if (planId === 'free') {
       return;
     }
 
@@ -113,12 +120,13 @@ const SubscriptionsModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
             const PlanIcon = plan.icon;
             const isCurrentPlan = plan.id === currentTier;
             const isSelected = selectedPlan === plan.id;
+            const isFree = plan.id === 'free';
 
             return (
               <div
                 key={plan.id}
                 className={`${styles.planCard} ${isCurrentPlan ? styles.currentPlan : ''} ${isSelected ? styles.selected : ''} ${plan.popular ? styles.popular : ''}`}
-                onClick={() => setSelectedPlan(plan.id)}
+                onClick={() => !isFree && setSelectedPlan(plan.id)}
               >
                 {plan.popular && (
                   <div className={styles.popularBadge}>Most Popular</div>
@@ -159,17 +167,26 @@ const SubscriptionsModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
                 </div>
 
                 <button
-                  className={`${styles.selectButton} ${isCurrentPlan ? styles.currentButton : ''}`}
+                  className={`${styles.selectButton} ${isCurrentPlan ? styles.currentButton : ''} ${isFree ? styles.disabledButton : ''}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleUpgrade(plan.id);
                   }}
-                  disabled={isCurrentPlan || isUpgrading}
+                  disabled={isCurrentPlan || isFree || isUpgrading}
+                  style={{ 
+                    opacity: isFree ? 0.5 : 1,
+                    cursor: isFree ? 'not-allowed' : isCurrentPlan ? 'default' : 'pointer'
+                  }}
                 >
-                  {isUpgrading && selectedPlan === plan.id ? (
+                  {isCurrentPlan ? (
+                    <>
+                      <Check size={16} />
+                      Current Plan
+                    </>
+                  ) : isFree ? (
+                    'Free Plan'
+                  ) : isUpgrading && selectedPlan === plan.id ? (
                     <span className={styles.spinner}></span>
-                  ) : isCurrentPlan ? (
-                    'Current Plan'
                   ) : (
                     `Select ${plan.name}`
                   )}
